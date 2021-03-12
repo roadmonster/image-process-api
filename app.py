@@ -77,8 +77,25 @@ def flip():
 
     return Response(response = resp, status = 200, mimetype = "application/octet_stream")
 
+@app.route('/img/gray', mthods = ['POST'])
+def gray():
+    recv_img = request.data
+    img_arr = np.fromstring(recv_img, uint8)
 
+    img = cv2.imdecode(img_arr, cv2.IMREAD_COLOR)
 
+    img = cv2.cvtColor(img, cv2.COLOR_BAYER_BG2GRAY)
+
+    resp, _, _ = compress_nparr(img)
+
+    return Response(response= resp, status = 200, mimetype = "application/octet_stream")
 
 if __name__ == '__main__':
     app.run()
+
+
+def main():
+    app.run(host="0.0.0.0", port=5000)
+
+if __name__ == '__main__':
+    main()
