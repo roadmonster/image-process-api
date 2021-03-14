@@ -15,7 +15,7 @@ def compress_nparr(nparr):
     compressed = zlib.compress(uncompressed)
     return compressed, len(uncompressed), len(compressed)
 
-@app.route('/img/resize', method=['POST'])
+@app.route('/img/resize', methods=['POST'])
 def resize():
     img = request.data
     img_arr = np.fromstring(img, np.uint8)
@@ -32,7 +32,7 @@ def resize():
     
     my_img = cv2.imdecode(img_arr, cv2.IMREAD_COLOR)
 
-    my_img = cv2.resize(img, (width, height))
+    my_img = cv2.resize(my_img, (width, height))
     resp,_,_=compress_nparr(img)
     return Response(response=resp, status=200, mimetype="application/octet_stream")
 
@@ -79,7 +79,7 @@ def flip():
 
     return Response(response=resp, status=200, mimetype="application/octet_stream")
 
-@app.route('/img/gray', mthods=['POST'])
+@app.route('/img/gray', methods=['POST'])
 def gray():
     recv_img = request.data
     img_arr = np.fromstring(recv_img, np.uint8)
