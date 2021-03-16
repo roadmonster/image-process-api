@@ -8,6 +8,7 @@ import cv2
 import requests
 import json
 import argparse
+import sys
 
 from pathlib import Path
 
@@ -172,4 +173,69 @@ def parse_args():
     return parser
 
 _ops= ['resize', 'flip', 'gray', 'rotate']
+def apply_ops(parser):
+
+    all_argvs = sys.argv[1:]
+    argvs_list = []
+    temp_argvs = []
+    index = 0
+
+    while index < len(all_argvs):
+        if all_argvs[index] in _ops:
+            temp_argvs.append(all_argvs[index])
+            index++
+            while(index < len(all_argvs)):
+                if all_argvs[index] in _ops:
+                    argvs_list.append(temp_argvs)
+                    temp_argvs = []
+                    break;
+                temp_argvs.append(all_argvs[index])
+                index++
+            
+        else:
+            return None
+    
+    if len(temp_argvs) > 0:
+        argvs_list.append(temp_argvs)
+
+    argv_space = argparse.Namespace()
+    file_path = None
+    print('Command to execute: \n', argvs_list, '\n')
+    for args in argvs_list:
+        if not file_path is None:
+            args.append('-f')
+            args.append(file_path)
+        argv_space, _ = parser.parse_known_args(args, namespace=argv_space)
+        file_path = apply_op(argv_space)
+        if file_path is None:
+            print('{', args, '} failed')
+            return None
+        else:
+            print('{', args, '} done successfully')
+    return file_path
+
+def apply_op(results):
+
+    op = results.subparsers
+    if op == 'flip':
+        return flip(results.file, results.dir)
+    
+    if op == 'resize':
+        return resize(results.file, results.width, result.height)
+    
+    if op == 'rotate':
+        return rotate(results.file, results.angle)
+    
+    if op == 'gray':
+        return gray(results.file)
+    
+    return None
+
+if __name__ == '__main__':
+    parser = parse_args()
+    updated_file_path = apply_ops(parser)
+    print('final image: ', updated_file_path)
+    pass
+    
+    
 
